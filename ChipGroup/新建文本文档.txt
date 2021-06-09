@@ -1,0 +1,39 @@
+fun SecondHouseResult.addTagView(chipGroup: ChipGroup) {
+    chipGroup.removeAllViews()
+    if (tagTitle.isNotEmpty()) {
+        chipGroup.addView(
+            TextView(chipGroup.context).apply {
+                text = tagTitle
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11f)
+                setTextColor(Color.parseColor("#FFFFFF"))
+                setPadding(6, 6, 6, 6)
+                setBackgroundResource(R.drawable.bg_news_sz_es_title_tag)
+                gravity = Gravity.CENTER_VERTICAL
+            }
+        )
+    }
+
+    splitField(keyWords).forEachIndexed { index, s ->
+        if (index >= 3) return
+        if (s.isNotEmpty()) {
+            chipGroup.addView(
+                TextView(chipGroup.context).apply {
+                    text = s
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11f)
+                    setTextColor(Color.parseColor("#333333"))
+                    setPadding(6, 6, 6, 6)
+                    setBackgroundResource(R.drawable.bg_news_sz_es_broker_label)
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+            )
+        }
+    }
+}

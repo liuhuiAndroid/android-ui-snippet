@@ -1,0 +1,52 @@
+    fun rentPrice(json: SecondHouseResult, textView: TextView) {
+        val price = json.rentPrice
+        if (price.toInt() <= 0) {
+            textView.text = "暂无"
+            return
+        }
+
+        val priceBuilder = StringBuilder()
+        priceBuilder.append(price.format(0, "", RoundingMode.HALF_UP))
+        val suffixStart = priceBuilder.length
+        priceBuilder.append("元/月")
+        val suffixEnd = priceBuilder.length
+        val priceSpannable = SpannableString(priceBuilder.toString())
+        priceSpannable.setSpan(
+            AbsoluteSizeSpan(11.dp), suffixStart, suffixEnd,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        textView.text = priceSpannable
+    }
+
+fun SecondHouseResult.totalPrice(textView: AppCompatTextView) {
+    if (salePrice == 0.0) {
+        textView.visibility = View.GONE
+        return
+    }
+    val ssb = SpannableStringBuilder()
+    val text = this.salePrice.priceESTotal()
+    ssb.append(text)
+    ssb.setSpan(AbsoluteSizeSpan(16, true), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    if (ssb.length > 1) {
+        ssb.setSpan(
+            AbsoluteSizeSpan(10, true),
+            text.length - 1,
+            text.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+    textView.text = ssb
+}
+
+fun SecondHouseResult.avgPrice(textView: AppCompatTextView) {
+    if (unitSalePrice > 0) {
+        textView.text = String.format(
+            Locale.CHINA,
+            "%s元/平",
+            unitSalePrice.format(0, mode = RoundingMode.HALF_UP)
+        )
+        textView.visible()
+    } else {
+        textView.gone()
+    }
+}

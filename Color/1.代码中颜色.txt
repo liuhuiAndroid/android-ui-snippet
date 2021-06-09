@@ -1,0 +1,4 @@
+
+object ColorResource {
+    const val color_333333: Int = 0xFF333333.toInt()
+}

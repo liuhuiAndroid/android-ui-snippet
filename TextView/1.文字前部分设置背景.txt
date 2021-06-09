@@ -1,0 +1,121 @@
+fun TextView.setSpan(text1: String, text2: String) {
+    val ssb = SpannableStringBuilder()
+    ssb.append(text1)
+    ssb.setSpan(
+        TextViewBackgroundColorSpan().apply {
+            setPadding(t = 2.dp, b = 1.dp)
+            setTextSize(11.dpf)
+        },
+        0, text1.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+    ssb.append(text2)
+    this.text = ssb
+}
+
+fun TextView.setSpanWithColor(
+    text1: String,
+    text2: String,
+    @ColorInt startColor: Int,
+    @ColorInt endColor: Int
+) {
+    val ssb = SpannableStringBuilder()
+    ssb.append(text1)
+    ssb.setSpan(
+        TextViewBackgroundColorSpan().apply {
+            setPadding(t = 2.dp, b = 1.dp)
+            setTextSize(11.dpf)
+            setColors(startColor, endColor)
+        },
+        0, text1.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+    ssb.append(text2)
+    this.text = ssb
+}
+
+class TextViewBackgroundColorSpan : ReplacementSpan() {
+    private val outRect = Rect()
+    private var curTextSize = 12.dpf
+    private var textColor: Int = Color.WHITE
+    private val background by lazy {
+        GradientDrawable().apply {
+            //设置圆角矩形背景
+            shape = GradientDrawable.RECTANGLE
+            //设置线性渐变，除此之外还有：
+            // GradientDrawable.SWEEP_GRADIENT（扫描式渐变）
+            // GradientDrawable.RADIAL_GRADIENT（圆形渐变）
+            gradientType = GradientDrawable.LINEAR_GRADIENT
+            //设置圆角半径
+            cornerRadius = 2.dpf
+            //设置渐变方向从左到右
+            orientation = GradientDrawable.Orientation.LEFT_RIGHT
+            //增加渐变效果需要使用setColors方法来设置颜色（中间可以增加多个颜色值）
+            colors = intArrayOf(0xFFEF5555.toInt(), 0xFFEF5555.toInt())
+        }
+    }
+
+
+    /**
+     * 增加渐变效果需要使用setColors方法来设置颜色（中间可以增加多个颜色值）
+     */
+    fun setColors(@ColorInt startColor: Int, @ColorInt endColor: Int) {
+        background.colors = intArrayOf(startColor, endColor)
+    }
+
+    /**
+     * 设置文字颜色
+     */
+    fun setTextColor(@ColorInt textColor: Int) {
+        this.textColor = textColor
+    }
+
+    /**
+     * 设置文字大小
+     */
+    fun setTextSize(textSize: Float) {
+        curTextSize = textSize
+    }
+
+    /**
+     * 设置背景padding
+     */
+    fun setPadding(l: Int = 0, t: Int = 0, r: Int = 0, b: Int = 0) {
+        outRect.set(l, t, r, b)
+    }
+
+    override fun getSize(
+        paint: Paint, text: CharSequence, start: Int, end: Int, fm: FontMetricsInt?
+    ): Int {
+        paint.init()
+        return (paint.measureText(text, start, end) + 10.dp).toInt()
+    }
+
+    private fun Paint.init() {
+        color = textColor
+        textSize = curTextSize
+        typeface = Typeface.DEFAULT
+        textAlign = Paint.Align.CENTER
+    }
+
+
+    override fun draw(
+        canvas: Canvas, text: CharSequence, start: Int, end: Int, x: Float, top: Int, y: Int,
+        bottom: Int, paint: Paint
+    ) {
+        paint.init()
+        //背景范围,比文字宽8dp
+        val textWidth = paint.measureText(text, start, end).toInt() + 8.dp
+        background.setBounds(
+            x.toInt() + outRect.left,
+            top + outRect.top,
+            x.toInt() + textWidth + outRect.right,
+            bottom - outRect.bottom
+        )
+        background.draw(canvas)
+        val fm = paint.fontMetrics
+        val textY = background.bounds.centerY() + (fm.bottom - fm.top) / 2 - fm.bottom
+        //画文字,两边各增加4dp
+        canvas.drawText(text, start, end, background.bounds.centerX().toFloat(), textY, paint)
+        paint.reset()
+    }
+
+}
