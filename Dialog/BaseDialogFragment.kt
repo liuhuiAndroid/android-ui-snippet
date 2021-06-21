@@ -78,3 +78,12 @@ abstract class BaseDialogFragment : DialogFragment() {
         }
     }
 }
+
+
+    <style name="ZF_Dialog_Center_Style" parent="@android:style/Theme.Dialog">
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <!--        <item name="android:windowAnimationStyle">@style/CenterDialogAnimationStyle</item>-->
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
