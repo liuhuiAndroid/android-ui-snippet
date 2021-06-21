@@ -1,0 +1,61 @@
+1. 通过依赖注入解耦:服务管理(一) 暴露服务
+public interface IMsgUpdateService extends IProvider {
+    void update(@MsgUpdate int msgUpdate);
+}
+
+@Route(path = RouterPath.MSG_UPDATE)
+public class MsgUpdateService implements IMsgUpdateService {
+
+    public void update(@MsgUpdate int msgUpdate) {
+        switch (msgUpdate) {
+            case MsgUpdate.MSG_OFFICIAL:
+                sendBroadcast(MsgUpdateAction.ACT_OFFICIAL);
+                break;
+      }
+    }
+}
+2. 通过依赖注入解耦:服务管理(二) 发现服务
+ARouter.getInstance().navigation(IMsgUpdateService.class).update(MsgUpdate.MSG_AGENT);
+
+3. 发送广播
+private void sendBroadcast(@NonNull String action) {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(action));
+    }
+
+4. 注册监听
+private final BroadcastReceiver mChatMessageRefresh = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction() != null ? intent.getAction() : "";
+            if (mMsgUpdateViewModel != null && !TextUtils.isEmpty(action)) {
+                switch (action) {
+                    case MsgUpdateAction.ACT_IM_REFRESH:
+                        mMsgUpdateViewModel.publish(MsgUpdate.MSG_IM_REFRESH);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    };
+
+IntentFilter intentFilter = new IntentFilter();
+intentFilter.addAction(MsgUpdateAction.ACT_OFFICIAL);
+LocalBroadcastManager.getInstance(this).registerReceiver(mChatMessageRefresh, intentFilter);
+
+LocalBroadcastManager.getInstance(this).unregisterReceiver(mChatMessageRefresh);
+
+5. ViewModel 处理
+public class MsgUpdateViewModel extends BaseViewModel {
+
+    private MutableLiveData<Integer> mLiveData = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> subscribe() {
+        return mLiveData;
+    }
+
+    public void publish(@MsgUpdate int event) {
+        mLiveData.postValue(event);
+    }
+
+}

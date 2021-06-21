@@ -32,6 +32,18 @@ fun TextView.setSpanWithColor(
     this.text = ssb
 }
 
+        private fun AppCompatTextView.tip(text: String, tip: String) {
+            val ssb = SpannableStringBuilder()
+            ssb.append(text)
+            val start = ssb.length
+            ssb.append(tip)
+            ssb.setSpan(
+                ForegroundColorSpan(Color.parseColor("#218FEE")),
+                start, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            this.text = ssb
+        }
+
 class TextViewBackgroundColorSpan : ReplacementSpan() {
     private val outRect = Rect()
     private var curTextSize = 12.dpf
